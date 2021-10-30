@@ -1,8 +1,8 @@
 To make new Virtual Environment:
-python3 -m venv <name/path>
+python3 -m venv name/path
 
 To activate Virtual Environment:
-source <path to ve>/bin/activate
+source path_to_ve/bin/activate
 
 To deactivate:
 source deactivate
