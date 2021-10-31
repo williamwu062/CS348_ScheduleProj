@@ -1,9 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Student Sign Up{% endblock %}
+{% block title %}Add Student{% endblock %}
 {% block content %}
-  <h1>Login</h1>
+  <h1>Add Student</h1>
   <form method="post" action="">
-    <div class="form-group">
+    <label for="InputID">Student ID</label>
+    <input type="number" id="InputID"><br />
+    <label for="InputName">Name</label>
+    <input type="text" id="InputName"><br />
+    <label for="InputDOB">Date of Birth</label>
+    <input type="date" id="InputDOB"><br />
+    <label for="InputDept">Department</label>
+    <input type="text" id="InputDept"><br />
+    <label for="InputEnroll">Enrollment Date</label>
+    <input type="date" id="InputEnroll"><br /><br />
+
+    <!-- <div class="form-group">
       <label for="InputEmail1">Email address</label>
       <input type="email" class="form-control" id="InputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
       <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
@@ -11,7 +22,8 @@
     <div class="form-group">
       <label for="InputPassword1">Password</label>
       <input type="password" class="form-control" id="InputPassword1" placeholder="Password">
-    </div>
+    </div> -->
+
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 {% endblock %}

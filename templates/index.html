@@ -2,7 +2,8 @@
 {% block title %}Home Page{% endblock %}
 {% block content %}
     <form method="post" action="">
-        <a href="{{url_for('s_signup')}}" class=btn btn-default ">Student Sign Up</a>
-        <a href="{{url_for('s_login')}}" class=btn btn-info">Student Login</a>
+        <a href="{{url_for('s_student_add')}}" class=btn btn-default ">Student Add</a>
+        <a href="{{url_for('s_professor_add')}}" class=btn btn-info">Professor Add</a>
+        <a href="{{url_for('s_delete')}}" class=btn btn-info">Delete Student/Professor</a>
     </form>
 {% endblock %}
