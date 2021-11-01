@@ -2,8 +2,8 @@
 {% block title %}Home Page{% endblock %}
 {% block content %}
     <form method="post" action="">
-        <a href="{{url_for('s_student_add')}}" class=btn btn-default ">Student Add</a>
-        <a href="{{url_for('s_professor_add')}}" class=btn btn-info">Professor Add</a>
-        <a href="{{url_for('s_delete')}}" class=btn btn-info">Delete Student/Professor</a>
+        <a href="{{url_for('addStudent')}}" class=btn btn-default ">Add Student</a>
+        <a href="{{url_for('addProfessor')}}" class=btn btn-info">Add Professor</a>
+        <a href="{{url_for('deleteEntry')}}" class=btn btn-info">Delete Entry</a>
     </form>
 {% endblock %}
