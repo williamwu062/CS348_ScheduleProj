@@ -1,7 +1,21 @@
 from types import MethodDescriptorType
 from flask import Flask, redirect, url_for, render_template, request
+from flask_sqlalchemy import SQLAlchemy
+import configparser
 
 app = Flask(__name__)
+password = groupprojectpassword
+dbname = project
+project_id = 
+
+db = SQLAlchemy(app)
+
+class Students(db.model):
+  student_id = db.Column(db.Integer, primary_key = True, nullable = False)
+  name = db.Column(db.String(250), nullable = False)
+  birthdate = db.Column(db.String(250), nullable = False, unique = False)
+  major = db.Column(db.String(250), nullable = True)
+  enrollment_date = db.Column(db.Integer, nullable = False)
 
 @app.route("/", methods=["post", "get"])
 def home():
