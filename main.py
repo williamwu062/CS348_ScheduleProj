@@ -9,6 +9,17 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+class Courses(db.Model):
+  course_id = db.Column(db.Integer, primary_key = True)
+  department = db.Column(db.String(250))
+  courseName = db.Column(db.String(250))
+
+  def __init__(self, course_id, department, courseName):
+    self.course_id = course_id
+    self.department = department
+    self.courseName = courseName
+
+
 class Students(db.Model):
   student_id = db.Column(db.Integer, primary_key = True)
   name = db.Column(db.String(250))
@@ -95,9 +106,8 @@ def addCourse():
     data = request.form
     for name in data.keys():
       print(name)
-    print(data['enrolldate'])
-    student = Students(int(data['id']), data['name'], data['birthdate'], data['major'], data['enrolldate'])
-    db.session.add(student)
+    course = Courses(int(data['id']), data['department'], data['coursename'])
+    db.session.add(course)
     db.session.commit()
     return redirect(url_for('home'))
   else:
