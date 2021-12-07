@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 import configparser
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Students.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Scheduler.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -62,7 +62,6 @@ def viewStudent():
 def viewStudentTable(id):
   return render_template("viewStudentTable.html", student=Students.query.filter_by(student_id = id).first())
 
-
 @app.route("/add_professor")
 def addProfessor():
   return render_template("addProfessor.html")
@@ -71,6 +70,55 @@ def addProfessor():
 def deleteEntry():
   return render_template("deleteEntry.html")
 
+
+
+
+
+@app.route("/edit_course", methods=["POST", "GET"])
+def editCourse():
+  if request.method == "POST":
+    data = request.form
+    for name in data.keys():
+      print(name)
+    print(data['enrolldate'])
+    student = Students(int(data['id']), data['name'], data['birthdate'], data['major'], data['enrolldate'])
+    db.session.add(student)
+    db.session.commit()
+    return redirect(url_for('home'))
+  else:
+    print('yo')
+    return render_template("editCourse.html")
+
+@app.route("/add_course", methods=["POST", "GET"])
+def addCourse():
+  if request.method == "POST":
+    data = request.form
+    for name in data.keys():
+      print(name)
+    print(data['enrolldate'])
+    student = Students(int(data['id']), data['name'], data['birthdate'], data['major'], data['enrolldate'])
+    db.session.add(student)
+    db.session.commit()
+    return redirect(url_for('home'))
+  else:
+    print('yo')
+    return render_template("addCourse.html")
+    
+@app.route("/view_courses", methods=["POST", "GET"])
+def viewCourses():
+  if request.method == "POST":
+    id = int(request.form['id'])
+    return redirect(url_for('viewStudentTable', id=id))
+  else:
+    return render_template("viewCourses.html")
+
+
+
+
+
 if __name__ == "__main__":
   db.create_all()
   app.run(debug=True)
+
+
+  
