@@ -44,6 +44,10 @@ def home():
     return url_for("addProfessor")
   if request.form.get("deleteEntry"):
     return url_for("deleteEntry")
+  if request.form.get("viewCourseReview"):
+    return url_for("viewCourseReview")
+  if request.form.get("viewStudentSchedule"):
+    return url_for("viewStudentSchedule")
   return render_template("index.html")
 
 @app.route("/add_student", methods=["POST", "GET"])
@@ -122,9 +126,13 @@ def viewCourses():
   else:
     return render_template("viewCourses.html")
 
+@app.route("/view_course_review", methods=["POST", "GET"])
+def viewCourseReview():
+  return render_template("viewCourseReview.html")
 
-
-
+@app.route("/view_student_schedule", methods=["POST", "GET"])
+def viewStudentSchedule():
+  return render_template("viewStudentSchedule.html"
 
 if __name__ == "__main__":
   db.create_all()
