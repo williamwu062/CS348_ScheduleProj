@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}View Courses List{% endblock %}
+{% block content %}
+<div id="coursesList"></div>
+<script>
+  var coursesString = "{{courses}}"
+  var courses = coursesString.split('\t')
+
+  var str = '<h1>Sorted List of Courses</h1><ul>'
+  courses.forEach(function(course) {
+    if(course !== ''){
+      str += '<li>'+ course + '</li>';
+    }
+  }); 
+  str += '</ul>';
+
+  document.getElementById("coursesList").innerHTML = str;
+</script>
+{% endblock %}
