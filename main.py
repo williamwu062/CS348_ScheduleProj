@@ -43,6 +43,12 @@ def home():
     return url_for("addStudent")
   if request.form.get("addProfessor"):
     return url_for("addProfessor")
+  if request.form.get("addCourse"):
+    return url_for("addCourse")
+  if request.form.get("editCourse"):
+    return url_for("editCourse")
+  if request.form.get("viewCourse"):
+    return url_for("viewCourse")
   if request.form.get("deleteEntry"):
     return url_for("deleteEntry")
   if request.form.get("viewCourseReview"):
