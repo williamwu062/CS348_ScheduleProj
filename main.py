@@ -43,6 +43,12 @@ def home():
     return url_for("addStudent")
   if request.form.get("addProfessor"):
     return url_for("addProfessor")
+  if request.form.get("addCourse"):
+    return url_for("addCourse")
+  if request.form.get("editCourse"):
+    return url_for("editCourse")
+  if request.form.get("viewCourses"):
+    return url_for("viewCourses")
   if request.form.get("deleteEntry"):
     return url_for("deleteEntry")
   if request.form.get("viewCourseReview"):
@@ -131,8 +137,39 @@ def addCourse():
 @app.route("/view_courses", methods=["POST", "GET"])
 def viewCourses():
   if request.method == "POST":
-    id = int(request.form['id'])
-    return redirect(url_for('viewStudentTable', id=id))
+    data = request.form
+    department = data['department']
+    courseName = data['coursename']
+
+    groupBy = False
+    if data.get('groupdept'):
+      groupBy = True
+      rawQuery = """SELECT department, sum(course_id) AS sumIDs FROM Courses GROUP BY department"""
+      if data.get('alphabet'):
+        rawQuery = rawQuery + """ ORDER BY department"""
+        
+    else:
+      rawQuery = """SELECT * FROM Courses"""
+      if courseName is not None and len(courseName) > 0:
+        rawQuery = """SELECT * FROM Courses WHERE courseName=\"""" + courseName + """\""""
+      if department is not None and len(department) > 0:
+        rawQuery = """SELECT * FROM Courses WHERE department=\"""" + department + """\""""
+        if courseName is not None and len(courseName) > 0:
+          rawQuery = """SELECT * FROM Courses WHERE department=\"""" + department + """\" AND courseName=\"""" + courseName + """\""""
+      if data.get('alphabet'):
+        rawQuery = rawQuery + """ ORDER BY courseName"""
+    
+    queryResult = db.session.execute(rawQuery)
+
+    courses = ""
+    for row in queryResult:
+      if groupBy:
+        courses += "Department: " + row.department + ", Sum of IDs: " + str(row.sumIDs) + "\t"
+      else:
+        courses += "Course ID: " + str(row.course_id) + ", Course Name: " + row.courseName + ", Department: " + row.department + "\t"
+
+    return render_template("viewCoursesList.html", courses=courses)
+
   else:
     return render_template("viewCourses.html")
 
