@@ -2,39 +2,14 @@ from types import MethodDescriptorType
 from flask import Flask, redirect, url_for, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 import configparser
+from datetime import datetime
+from Tables import Courses, Students, Reviews, StudentSchedule
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Scheduler.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
-
-class Courses(db.Model):
-    course_id = db.Column(db.Integer, primary_key=True)
-    department = db.Column(db.String(250))
-    courseName = db.Column(db.String(250))
-
-    def __init__(self, course_id, department, courseName):
-        self.course_id = course_id
-        self.department = department
-        self.courseName = courseName
-
-
-class Students(db.Model):
-    student_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250))
-    birthdate = db.Column(db.String(250))
-    major = db.Column(db.String(250))
-    enrollment_date = db.Column(db.String(250))
-
-    def __init__(self, student_id, name, birthdate, major, enrollment_date):
-        self.student_id = student_id
-        self.name = name
-        self.birthdate = birthdate
-        self.major = major
-        self.enrollment_date = enrollment_date
-
 
 @app.route("/", methods=["POST", "GET"])
 def home():
@@ -51,10 +26,12 @@ def home():
     return url_for("viewCourses")
   if request.form.get("deleteEntry"):
     return url_for("deleteEntry")
-  if request.form.get("viewCourseReview"):
-    return url_for("viewCourseReview")
+  if request.form.get("viewCourseReviews"):
+    return url_for("viewCourseReviews")
   if request.form.get("viewStudentSchedule"):
     return url_for("viewStudentSchedule")
+  if request.form.get("editStudentSchedule"):
+    return url_for("editStudentSchedule")
   return render_template("index.html")
 
 @app.route("/add_student", methods=["POST", "GET"])
@@ -177,14 +154,90 @@ def viewCourses():
   else:
     return render_template("viewCourses.html")
 
-@app.route("/view_course_review", methods=["POST", "GET"])
-def viewCourseReview():
-  return render_template("viewCourseReview.html")
+@app.route("/view_course_reviews", methods=["POST", "GET"])
+def viewCourseReviews():
+	if request.method == "POST":
+		#Get courseName that user put into the form
+		data = request.form
+		courseName = data['coursename']
+		
+		#Get the course_id associated with that courseName
+		result = Courses.query.filter_by(courseName=courseName).first()
+		courseID = 0
+		try:
+			courseID = result.course_id
+		except AttributeError:
+			returnString = "No course was found with that name."
+			return render_template("viewCourseReviewsList.html", courseReviews=returnString)
+			
+		#Get course reviews associated with that course_id
+		rawQuery = """SELECT * FROM Reviews AS R WHERE R.course_id=\"""" + str(courseID) + """\""""
+		result2 = db.session.execute(rawQuery)
+		
+		#Collate course reviews into a string
+		courseReviews = ""
+		for row in result2:
+			courseReviews += "Review ID: " + str(row.review_id) + ", Semester: " + str(row.semester) + ", Course ID: " + str(row.course_id) + ", Course Name: " + courseName + ", Review: " + str(row.review) + ", Review Date: " + str(row.review_date) + "\t"
+		
+		if (courseReviews == ""):
+			courseReviews = "No reviews have been written yet for course \'" + courseName + "\'"
+			
+		return render_template("viewCourseReviewsList.html", courseReviews=courseReviews)
+	else: 
+		return render_template("viewCourseReviews.html")
 
 @app.route("/view_student_schedule", methods=["POST", "GET"])
 def viewStudentSchedule():
-  return render_template("viewStudentSchedule.html")
+	if request.method == "POST":
+		#Get student_id that user put into the form
+		data = request.form
+		studentID = data['id']
+		
+		#Get course_ids associated with the schedule of the student with that student_id
+		result = StudentSchedule.query.filter_by(student_id=studentID)
+		if (len(result.all()) == 0):
+			return render_template("viewStudentScheduleList.html", studentScheduleList="No student with that id exists")
+		
+		#Get courses associated with each course_id, collate into a string
+		studentScheduleList = ""
+		for row in result:
+			result2 = Courses.query.filter_by(course_id=row.course_id).first()
+			try:
+				studentScheduleList += "Course ID: " + str(result2.course_id) + ", Department" + str(result2.department) + ", Course Name" + str(result2.courseName) + "\t"
+			except:
+				pass
+		
+		if (studentScheduleList == ""):
+			studentScheduleList = "No valid courses have been added to this student's schedule"
+		
+		return render_template("viewStudentScheduleList.html", studentScheduleList=studentScheduleList)
+	else:	
+		return render_template("viewStudentSchedule.html")
 
+@app.route("/edit_student_schedule", methods=["POST", "GET"])
+def editStudentSchedule():
+	if request.method == "POST":
+		#Get form information that the user inputted
+		data = request.form
+		studentID = data['studentid']
+		courseID = data['courseid']
+		adding = data['options'] == "Add"
+		deleting = data['options'] == "Delete"
+		
+		#If adding a course to a student's schedule
+		studentCourse = StudentSchedule(int(studentID), int(courseID))
+		db.session.add(studentCourse)
+		db.session.commit()
+		
+		#If deleting a course from a student's schedule
+		try:
+			StudentSchedule.query.filter(StudentSchedule.student_id == int(studentID), StudentSchedule.course_id == int(courseID)).delete()
+			db.session.commit()
+		finally:
+			return redirect(url_for('home'))
+	if request.method == "GET":
+		return render_template("editStudentSchedule.html")
+		
 if __name__ == "__main__":
   db.create_all()
   app.run(debug=True)
