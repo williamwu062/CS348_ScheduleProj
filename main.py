@@ -30,6 +30,8 @@ def home():
     return url_for("viewCourseReviews")
   if request.form.get("viewStudentSchedule"):
     return url_for("viewStudentSchedule")
+  if request.form.get("editStudentSchedule"):
+    return url_for("editStudentSchedule")
   return render_template("index.html")
 
 @app.route("/add_student", methods=["POST", "GET"])
@@ -189,19 +191,49 @@ def viewStudentSchedule():
 		
 		#Get course_ids associated with the schedule of the student with that student_id
 		result = StudentSchedule.query.filter_by(student_id=studentID)
+		if (len(result.all()) == 0):
+			return render_template("viewStudentScheduleList.html", studentScheduleList="No student with that id exists")
 		
-		#Collate courses into a string
+		#Get courses associated with each course_id, collate into a string
 		studentScheduleList = ""
 		for row in result:
-			studentScheduleList += "Course ID: " + str(row.course_id) + ", Department" + str(row.department) + ", Course Name" + str(row.courseName) + "\t"
+			result2 = Courses.query.filter_by(course_id=row.course_id).first()
+			try:
+				studentScheduleList += "Course ID: " + str(result2.course_id) + ", Department" + str(result2.department) + ", Course Name" + str(result2.courseName) + "\t"
+			except:
+				pass
 		
 		if (studentScheduleList == ""):
-			studentScheduleList = "No courses have been added to this student's schedule"
+			studentScheduleList = "No valid courses have been added to this student's schedule"
 		
 		return render_template("viewStudentScheduleList.html", studentScheduleList=studentScheduleList)
 	else:	
 		return render_template("viewStudentSchedule.html")
 
+@app.route("/edit_student_schedule", methods=["POST", "GET"])
+def editStudentSchedule():
+	if request.method == "POST":
+		#Get form information that the user inputted
+		data = request.form
+		studentID = data['studentid']
+		courseID = data['courseid']
+		adding = data['options'] == "Add"
+		deleting = data['options'] == "Delete"
+		
+		#If adding a course to a student's schedule
+		studentCourse = StudentSchedule(int(studentID), int(courseID))
+		db.session.add(studentCourse)
+		db.session.commit()
+		
+		#If deleting a course from a student's schedule
+		try:
+			StudentSchedule.query.filter(StudentSchedule.student_id == int(studentID), StudentSchedule.course_id == int(courseID)).delete()
+			db.session.commit()
+		finally:
+			return redirect(url_for('home'))
+	if request.method == "GET":
+		return render_template("editStudentSchedule.html")
+		
 if __name__ == "__main__":
   db.create_all()
   app.run(debug=True)

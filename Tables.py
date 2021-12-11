@@ -55,6 +55,5 @@ class StudentSchedule(db.Model):
 	course_id = db.Column(db.Integer, db.ForeignKey(Courses.course_id), nullable=False, primary_key=True)
 	
 	def __init__(self, student_id, course_id):
-		self.random_key = random_key
 		self.student_id = student_id
 		self.course_id = course_id

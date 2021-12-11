@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Edit Student Schedule{% endblock %}
+{% block content %}
+  <h1>Delete Entry</h1>
+  <form method="post" action="">
+	<div>
+		<input type="radio" id="add" name="options" value="Add" checked>
+		<label for="add">Add</label>
+		<input type="radio" id="delete" name="options" value="Delete">
+		<label for="delete">Delete</label><br />
+	</div>
+    <label for="studentid">Student ID of Student Schedule to Update</label>
+    <input type="text" name="studentid"><br />
+	<label for="courseid">Course ID of Course to Add or Delete</label>
+    <input type="text" name="courseid"><br />
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+{% endblock %}
