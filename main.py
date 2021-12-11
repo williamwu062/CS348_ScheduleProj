@@ -195,18 +195,18 @@ def viewStudentSchedule():
 			return render_template("viewStudentScheduleList.html", studentScheduleList="No student with that id exists")
 		
 		#Get courses associated with each course_id, collate into a string
-		studentScheduleList = ""
+		studentSchedule = ""
 		for row in result:
 			result2 = Courses.query.filter_by(course_id=row.course_id).first()
 			try:
-				studentScheduleList += "Course ID: " + str(result2.course_id) + ", Department" + str(result2.department) + ", Course Name" + str(result2.courseName) + "\t"
+				studentSchedule += "Course ID: " + str(result2.course_id) + ", Department" + str(result2.department) + ", Course Name" + str(result2.courseName) + "\t"
 			except:
 				pass
 		
-		if (studentScheduleList == ""):
-			studentScheduleList = "No valid courses have been added to this student's schedule"
+		if (studentSchedule == ""):
+			studentSchedule = "No valid courses have been added to this student's schedule"
 		
-		return render_template("viewStudentScheduleList.html", studentScheduleList=studentScheduleList)
+		return render_template("viewStudentScheduleList.html", studentSchedule=studentSchedule)
 	else:	
 		return render_template("viewStudentSchedule.html")
 
