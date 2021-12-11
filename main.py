@@ -3,55 +3,13 @@ from flask import Flask, redirect, url_for, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 import configparser
 from datetime import datetime
-
+from Tables import Courses, Students, Reviews, StudentSchedule
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Scheduler.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
-class Courses(db.Model):
-    course_id = db.Column(db.Integer, primary_key=True)
-    department = db.Column(db.String(250))
-    courseName = db.Column(db.String(250))
-
-    def __init__(self, course_id, department, courseName):
-        self.course_id = course_id
-        self.department = department
-        self.courseName = courseName
-
-
-class Students(db.Model):
-    student_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250))
-    birthdate = db.Column(db.String(250))
-    major = db.Column(db.String(250))
-    enrollment_date = db.Column(db.String(250))
-
-    def __init__(self, student_id, name, birthdate, major, enrollment_date):
-        self.student_id = student_id
-        self.name = name
-        self.birthdate = birthdate
-        self.major = major
-        self.enrollment_date = enrollment_date
-		
-class Reviews(db.Model):
-	review_id = db.Column(db.Integer, primary_key=True)
-	semester = db.Column(db.String(250))
-	course_id = db.Column(db.Integer, db.ForeignKey("Courses.course_id"), nullable=False)
-	review = db.Column(db.String(250))
-	review_date = db.Column(db.DateTime, onupdate=datetime.now())
-	student_id = db.Column(db.Integer, db.ForeignKey("Students.student_id"), nullable=False)
-	
-	def __init__(self, review_id, semester, course_id, review, review_date, student_id):
-		self.review_id = review_id
-		self.semester = semester
-		self.course_id = course_id
-		self.review = review
-		self.review_date = review_date
-		self.student_id = student_id
-
 
 @app.route("/", methods=["POST", "GET"])
 def home():
@@ -198,31 +156,51 @@ def viewCourseReviews():
 		courseName = data['coursename']
 		
 		#Get the course_id associated with that courseName
-		getCourseIDQuery = """SELECT course_id FROM Courses WHERE courseName=\"""" + courseName + """\""""
-		result = db.session.execute(getCourseIDQuery).first()
+		result = Courses.query.filter_by(courseName=courseName).first()
+		courseID = 0
 		try:
-			courseID = str(result.courseName)
+			courseID = result.course_id
 		except AttributeError:
 			returnString = "No course was found with that name."
 			return render_template("viewCourseReviewsList.html", courseReviews=returnString)
 			
 		#Get course reviews associated with that course_id
-		query = "SELECT * FROM Reviews AS R WHERE R.course_id = %s"
-		result2 = db.session.execute(query, (courseID))
+		rawQuery = """SELECT * FROM Reviews AS R WHERE R.course_id=\"""" + str(courseID) + """\""""
+		result2 = db.session.execute(rawQuery)
 		
-		courseReviews = ""
 		#Collate course reviews into a string
+		courseReviews = ""
 		for row in result2:
-			courseReviews += "Review ID: " + str(row.review_id) + ", Semester: " + str(row.semester) + ", Course ID: " + str(row.course_id) + ", Course Name: " + courseName + ", Review: " + str(row.review) + ", Review Date: " + str(row.review_date)
+			courseReviews += "Review ID: " + str(row.review_id) + ", Semester: " + str(row.semester) + ", Course ID: " + str(row.course_id) + ", Course Name: " + courseName + ", Review: " + str(row.review) + ", Review Date: " + str(row.review_date) + "\t"
 		
+		if (courseReviews == ""):
+			courseReviews = "No reviews have been written yet for course \'" + courseName + "\'"
+			
 		return render_template("viewCourseReviewsList.html", courseReviews=courseReviews)
 	else: 
 		return render_template("viewCourseReviews.html")
 
 @app.route("/view_student_schedule", methods=["POST", "GET"])
 def viewStudentSchedule():
-	
-	return render_template("viewStudentSchedule.html")
+	if request.method == "POST":
+		#Get student_id that user put into the form
+		data = request.form
+		studentID = data['id']
+		
+		#Get course_ids associated with the schedule of the student with that student_id
+		result = StudentSchedule.query.filter_by(student_id=studentID)
+		
+		#Collate courses into a string
+		studentScheduleList = ""
+		for row in result:
+			studentScheduleList += "Course ID: " + str(row.course_id) + ", Department" + str(row.department) + ", Course Name" + str(row.courseName) + "\t"
+		
+		if (studentScheduleList == ""):
+			studentScheduleList = "No courses have been added to this student's schedule"
+		
+		return render_template("viewStudentScheduleList.html", studentScheduleList=studentScheduleList)
+	else:	
+		return render_template("viewStudentSchedule.html")
 
 if __name__ == "__main__":
   db.create_all()

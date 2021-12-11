@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}View Student Schedule List{% endblock %}
+{% block content %}
+<div id="studentScheduleList"></div>
+<script>
+  var studentScheduleString = "{{studentSchedule}}"
+  var studentSchedule = courseReviewsString.split('\t')
+
+  var str = '<h1>List of Student\'s Courses </h1><ul>'
+  studentSchedule.forEach(function(studentCourse) {
+    if(studentCourse !== ''){
+      str += '<li>'+ studentCourse + '</li>';
+    }
+  }); 
+  str += '</ul>';
+
+  document.getElementById("studentScheduleList").innerHTML = str;
+</script>
+{% endblock %}
