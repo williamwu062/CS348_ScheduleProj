@@ -2,13 +2,14 @@ from types import MethodDescriptorType
 from flask import Flask, redirect, url_for, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 import configparser
+from datetime import datetime
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Scheduler.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
 
 class Courses(db.Model):
     course_id = db.Column(db.Integer, primary_key=True)
@@ -34,6 +35,22 @@ class Students(db.Model):
         self.birthdate = birthdate
         self.major = major
         self.enrollment_date = enrollment_date
+		
+class Reviews(db.Model):
+	review_id = db.Column(db.Integer, primary_key=True)
+	semester = db.Column(db.String(250))
+	course_id = db.Column(db.Integer, db.ForeignKey("Courses.course_id"), nullable=False)
+	review = db.Column(db.String(250))
+	review_date = db.Column(db.DateTime, onupdate=datetime.now())
+	student_id = db.Column(db.Integer, db.ForeignKey("Students.student_id"), nullable=False)
+	
+	def __init__(self, review_id, semester, course_id, review, review_date, student_id):
+		self.review_id = review_id
+		self.semester = semester
+		self.course_id = course_id
+		self.review = review
+		self.review_date = review_date
+		self.student_id = student_id
 
 
 @app.route("/", methods=["POST", "GET"])
@@ -51,8 +68,8 @@ def home():
     return url_for("viewCourses")
   if request.form.get("deleteEntry"):
     return url_for("deleteEntry")
-  if request.form.get("viewCourseReview"):
-    return url_for("viewCourseReview")
+  if request.form.get("viewCourseReviews"):
+    return url_for("viewCourseReviews")
   if request.form.get("viewStudentSchedule"):
     return url_for("viewStudentSchedule")
   return render_template("index.html")
@@ -173,13 +190,39 @@ def viewCourses():
   else:
     return render_template("viewCourses.html")
 
-@app.route("/view_course_review", methods=["POST", "GET"])
-def viewCourseReview():
-  return render_template("viewCourseReview.html")
+@app.route("/view_course_reviews", methods=["POST", "GET"])
+def viewCourseReviews():
+	if request.method == "POST":
+		#Get courseName that user put into the form
+		data = request.form
+		courseName = data['coursename']
+		
+		#Get the course_id associated with that courseName
+		getCourseIDQuery = """SELECT course_id FROM Courses WHERE courseName=\"""" + courseName + """\""""
+		result = db.session.execute(getCourseIDQuery).first()
+		try:
+			courseID = str(result.courseName)
+		except AttributeError:
+			returnString = "No course was found with that name."
+			return render_template("viewCourseReviewsList.html", courseReviews=returnString)
+			
+		#Get course reviews associated with that course_id
+		query = "SELECT * FROM Reviews AS R WHERE R.course_id = %s"
+		result2 = db.session.execute(query, (courseID))
+		
+		courseReviews = ""
+		#Collate course reviews into a string
+		for row in result2:
+			courseReviews += "Review ID: " + str(row.review_id) + ", Semester: " + str(row.semester) + ", Course ID: " + str(row.course_id) + ", Course Name: " + courseName + ", Review: " + str(row.review) + ", Review Date: " + str(row.review_date)
+		
+		return render_template("viewCourseReviewsList.html", courseReviews=courseReviews)
+	else: 
+		return render_template("viewCourseReviews.html")
 
 @app.route("/view_student_schedule", methods=["POST", "GET"])
 def viewStudentSchedule():
-  return render_template("viewStudentSchedule.html")
+	
+	return render_template("viewStudentSchedule.html")
 
 if __name__ == "__main__":
   db.create_all()
