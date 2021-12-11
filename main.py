@@ -3,13 +3,8 @@ from flask import Flask, redirect, url_for, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 import configparser
 from datetime import datetime
-from Tables import Courses, Students, Reviews, StudentSchedule
+from Tables import Courses, Students, Reviews, StudentSchedule, app, db
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Scheduler.sqlite3'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
 
 @app.route("/", methods=["POST", "GET"])
 def home():
