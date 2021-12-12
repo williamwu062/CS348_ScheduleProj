@@ -221,25 +221,41 @@ def editStudentSchedule():
 		courseID = data['courseid']
 		adding = data['options'] == "Add"
 		deleting = data['options'] == "Delete"
+		result = ""
 		
 		#If adding a course to a student's schedule
 		if (adding == True):
-			
-			studentCourse = StudentSchedule(student_id=int(studentID), course_id=int(courseID))
-			db.session.add(studentCourse)
-			db.session.commit()
-			print("Successfully added tuple", studentCourse, " to StudentSchedule table")
+			checkCourse = Courses.query.filter_by(course_id=courseID).first()
+			if checkCourse is not None:
+				checkAlreadyEnrolled = StudentSchedule.query.filter_by(student_id=studentID, course_id=courseID).first()
+				if checkAlreadyEnrolled is not None:
+					result = "Student is already enrolled in course with id " + str(courseID) + ", did not add course"
+					return render_template("editStudentScheduleLanding.html", studentScheduleLanding=result)
+				studentCourse = StudentSchedule(student_id=int(studentID), course_id=int(courseID))
+				db.session.add(studentCourse)
+				db.session.commit()
+				result = "Successfully added course with id " + str(courseID) + " to the schedule of student with id " + str(studentID)
+				return render_template("editStudentScheduleLanding.html", studentScheduleLanding=result)
+			else:
+				result = "No course exists with id " + str(courseID) + ", could not add to student schedule"
+				return render_template("editStudentScheduleLanding.html", studentScheduleLanding=result)
 		#If deleting a course from a student's schedule
 		else:
 			try:
-				StudentSchedule.query.filter_by(student_id=studentID, course_id=courseID).delete()
-				db.session.commit()
-				print("Successfully deleted course with id", courseID, " from student's schedule")
+				checkStudentCourse = StudentSchedule.query.filter_by(student_id=studentID, course_id=courseID).first()
+				if checkStudentCourse is not None:
+					StudentSchedule.query.filter_by(student_id=studentID, course_id=courseID).delete()
+					db.session.commit()
+					result = "Successfully deleted course with id " + str(courseID) + " from student's schedule"
+					return render_template("editStudentScheduleLanding.html", studentScheduleLanding=result)
+				else:
+					result = "Course with id " + str(courseID) + " did not exist in this student's schedule, nothing to delete"
+					return render_template("editStudentScheduleLanding.html", studentScheduleLanding=result)
 			except:
-				print("Ran into error trying to delete course with id", courseID, " from this student's schedule")
+				result = "Ran into error trying to delete course with id " + str(courseID) + " from this student's schedule. Contact server owner for more information."
+				return render_template("editStudentScheduleLanding.html", studentScheduleLanding=result)
 				pass
 				
-		return redirect(url_for('home'))
 	if request.method == "GET":
 		return render_template("editStudentSchedule.html")
 		
