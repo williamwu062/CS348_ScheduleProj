@@ -5,7 +5,6 @@ import configparser
 from datetime import datetime
 from Tables import Courses, Students, Reviews, StudentSchedule, app, db
 
-
 @app.route("/", methods=["POST", "GET"])
 def home():
   print('hello')
@@ -190,15 +189,19 @@ def viewStudentSchedule():
 		
 		#Get course_ids associated with the schedule of the student with that student_id
 		result = StudentSchedule.query.filter_by(student_id=studentID)
-		if (len(result.all()) == 0):
-			return render_template("viewStudentScheduleList.html", studentScheduleList="No student with that id exists")
+		num_results = len(result.all())
+		print("num_results =", num_results)
+		if (num_results == 0):
+			returnString = "No schedule exists for student with id " + str(studentID)
+			print(returnString)
+			return render_template("viewStudentScheduleList.html", studentSchedule=returnString)
 		
 		#Get courses associated with each course_id, collate into a string
 		studentSchedule = ""
 		for row in result:
 			result2 = Courses.query.filter_by(course_id=row.course_id).first()
 			try:
-				studentSchedule += "Course ID: " + str(result2.course_id) + ", Department" + str(result2.department) + ", Course Name" + str(result2.courseName) + "\t"
+				studentSchedule += "Course ID: " + str(result2.course_id) + ", Department: " + str(result2.department) + ", Course Name: " + str(result2.courseName) + "\t"
 			except:
 				pass
 		
@@ -208,7 +211,7 @@ def viewStudentSchedule():
 		return render_template("viewStudentScheduleList.html", studentSchedule=studentSchedule)
 	else:	
 		return render_template("viewStudentSchedule.html")
-
+	
 @app.route("/edit_student_schedule", methods=["POST", "GET"])
 def editStudentSchedule():
 	if request.method == "POST":
@@ -220,16 +223,23 @@ def editStudentSchedule():
 		deleting = data['options'] == "Delete"
 		
 		#If adding a course to a student's schedule
-		studentCourse = StudentSchedule(int(studentID), int(courseID))
-		db.session.add(studentCourse)
-		db.session.commit()
-		
-		#If deleting a course from a student's schedule
-		try:
-			StudentSchedule.query.filter(StudentSchedule.student_id == int(studentID), StudentSchedule.course_id == int(courseID)).delete()
+		if (adding == True):
+			
+			studentCourse = StudentSchedule(student_id=int(studentID), course_id=int(courseID))
+			db.session.add(studentCourse)
 			db.session.commit()
-		finally:
-			return redirect(url_for('home'))
+			print("Successfully added tuple", studentCourse, " to StudentSchedule table")
+		#If deleting a course from a student's schedule
+		else:
+			try:
+				StudentSchedule.query.filter_by(student_id=studentID, course_id=courseID).delete()
+				db.session.commit()
+				print("Successfully deleted course with id", courseID, " from student's schedule")
+			except:
+				print("Ran into error trying to delete course with id", courseID, " from this student's schedule")
+				pass
+				
+		return redirect(url_for('home'))
 	if request.method == "GET":
 		return render_template("editStudentSchedule.html")
 		

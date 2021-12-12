@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}View Student Schedule List{% endblock %}
+{% block title %}View Student Schedule{% endblock %}
 {% block content %}
-<div id="studentScheduleList"></div>
+<div id="studentSchedule"></div>
 <script>
   var studentScheduleString = "{{studentSchedule}}"
-  var studentSchedule = courseReviewsString.split('\t')
+  var studentSchedule = studentScheduleString.split('\t')
 
-  var str = '<h1>List of Student\'s Courses </h1><ul>'
+  var str = '<h1>List of Student Courses</h1><ul>'
   studentSchedule.forEach(function(studentCourse) {
     if(studentCourse !== ''){
       str += '<li>'+ studentCourse + '</li>';
@@ -14,6 +14,6 @@
   }); 
   str += '</ul>';
 
-  document.getElementById("studentScheduleList").innerHTML = str;
+  document.getElementById("studentSchedule").innerHTML = str;
 </script>
 {% endblock %}
