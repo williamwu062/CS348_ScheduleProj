@@ -3,7 +3,7 @@ from flask import Flask, redirect, url_for, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 import configparser
 from datetime import datetime
-from Tables import Courses, Students, Reviews, StudentSchedule, app, db
+from Tables import Courses, Students, Reviews, StudentSchedule, CourseTimeSlots, app, db
 
 @app.route("/", methods=["POST", "GET"])
 def home():
@@ -97,12 +97,16 @@ def addCourse():
     data = request.form
     
     checkCourse = Courses.query.filter_by(course_id=data['id']).first()
-    if checkCourse is None:
+    checkProfessor = Courses.query.filter_by(prof_id=data['profID']).first()
+    if checkCourse is None and checkProfessor is not None:
       if data['coursename'] is not None and len(data['coursename']) > 0:
         if data['department'] is not None and len(data['department']) > 0:
-          course = Courses(int(data['id']), data['department'], data['coursename'])
-          db.session.add(course)
-          db.session.commit()
+          if data['dayOfWeek'] is not None and len(data['dayOfWeek']) > 0:
+            course = Courses(int(data['id']), data['department'], data['coursename'])
+            courseTimeSlot = CourseTimeSlots(int(data['id']), data['dayOfWeek'], int(data['profID']))
+            db.session.add(courseTimeSlot)
+            db.session.add(course)
+            db.session.commit()
 
     return redirect(url_for('home'))
   else:
@@ -212,6 +216,10 @@ def viewStudentSchedule():
 	else:	
 		return render_template("viewStudentSchedule.html")
 	
+
+
+
+
 @app.route("/edit_student_schedule", methods=["POST", "GET"])
 def editStudentSchedule():
 	if request.method == "POST":
