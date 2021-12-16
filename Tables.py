@@ -56,6 +56,18 @@ class Students(db.Model):
         self.major = major
         self.enrollment_date = enrollment_date
 		
+class Professors(db.Model):
+    professor_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250))
+    department = db.Column(db.String(250))
+    join_date = db.Column(db.String(250))
+
+    def __init__(self, professor_id, name, department, join_date):
+        self.professor_id = professor_id
+        self.name = name
+        self.department = department
+        self.join_date = join_date
+
 class Reviews(db.Model):
 	review_id = db.Column(db.Integer, primary_key=True)
 	semester = db.Column(db.String(250))

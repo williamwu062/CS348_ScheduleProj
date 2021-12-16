@@ -3,32 +3,34 @@ from flask import Flask, redirect, url_for, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 import configparser
 from datetime import datetime
-from Tables import Courses, Students, Reviews, StudentSchedule, CourseTimeSlots, Professors, app, db
-
+from Tables import Courses, Students, Reviews, StudentSchedule, Professors, CourseTimeSlots, app, db
 
 @app.route("/", methods=["POST", "GET"])
 def home():
-    print('hello')
-    if request.form.get("addStudent"):
-        return url_for("addStudent")
-    if request.form.get("addProfessor"):
-        return url_for("addProfessor")
-    if request.form.get("addCourse"):
-        return url_for("addCourse")
-    if request.form.get("editCourse"):
-        return url_for("editCourse")
-    if request.form.get("viewCourses"):
-        return url_for("viewCourses")
-    if request.form.get("deleteEntry"):
-        return url_for("deleteEntry")
-    if request.form.get("viewCourseReviews"):
-        return url_for("viewCourseReviews")
-    if request.form.get("viewStudentSchedule"):
-        return url_for("viewStudentSchedule")
-    if request.form.get("editStudentSchedule"):
-        return url_for("editStudentSchedule")
-    return render_template("index.html")
-
+  print('hello')
+  if request.form.get("addStudent"):
+    return url_for("addStudent")
+  if request.form.get("addProfessor"):
+    return url_for("addProfessor")
+  if request.form.get("addCourse"):
+    return url_for("addCourse")
+  if request.form.get("editProfessor"):
+    return url_for("editProfessor")
+  if request.form.get("editCourse"):
+    return url_for("editCourse")
+  if request.form.get("viewProfessor"):
+    return url_for("viewProfessor")
+  if request.form.get("viewCourses"):
+    return url_for("viewCourses")
+  if request.form.get("viewCourseReviews"):
+    return url_for("viewCourseReviews")
+  if request.form.get("viewStudentSchedule"):
+    return url_for("viewStudentSchedule")
+  if request.form.get("viewProfessorTable"):
+    return url_for("viewProfessorTable")
+  if request.form.get("editStudentSchedule"):
+    return url_for("editStudentSchedule")
+  return render_template("index.html")
 
 @app.route("/add_student", methods=["POST", "GET"])
 def addStudent():
@@ -46,6 +48,16 @@ def addStudent():
         print('yo')
         return render_template("addStudent.html")
 
+@app.route("/add_professor", methods=["POST", "GET"])
+def addProfessor():
+    if request.method == "POST":
+        data = request.form
+        professor = Professors(int(data['id']), data['name'], data['dept'], data['joined'])
+        db.session.add(professor)
+        db.session.commit()
+        return redirect(url_for('home'))
+    else:
+        return render_template("addProfessor.html")
 
 @app.route("/view_student", methods=["POST", "GET"])
 def viewStudent():
@@ -56,20 +68,43 @@ def viewStudent():
         return render_template("viewStudent.html")
 
 
-@app.route("/<id>")
+@app.route("/view_student/<id>")
 def viewStudentTable(id):
     return render_template("viewStudentTable.html", student=Students.query.filter_by(student_id=id).first())
 
+@app.route("/edit_professor", methods=["POST", "GET"])
+def editProfessor():
+  if request.method == "POST":
+      data = request.form
+      if data['id'] is not None and data['id'] != '':
+          professor = Professors.query.filter_by(professor_id = data['id']).first()
+          if professor is not None:
+            if data['dept'] is not None and len(data['dept']) > 0:
+              professor.department = data['dept']
+            if data['name'] is not None and len(data['name']) > 0:
+              professor.name = data['name']
+            if data['joined'] is not None and len(data['joined']) > 0:
+              professor.join_date = data['joined']
+            db.session.commit()
+      return redirect(url_for('home'))
+  else:
+      return render_template("editProfessor.html")
+  
+@app.route("/view_professor", methods=["POST", "GET"])
+def viewProfessor():
+    if request.method == "POST":
+        id = int(request.form['id'])
+        return redirect(url_for('viewProfessorTable', id=id))
+    else:
+        return render_template("viewProfessor.html")
 
-@app.route("/add_professor")
-def addProfessor():
-    return render_template("addProfessor.html")
-
+@app.route("/view_professor/<id>")
+def viewProfessorTable(id):
+  return render_template("viewProfessorTable.html", professor=Professors.query.filter_by(professor_id=id).first())
 
 @app.route("/delete_entry")
 def deleteEntry():
     return render_template("deleteEntry.html")
-
 
 @app.route("/edit_course", methods=["POST", "GET"])
 def editCourse():
