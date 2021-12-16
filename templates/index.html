@@ -2,17 +2,20 @@
 {% block title %}Home Page{% endblock %}
 {% block content %}
     <form method="post" action="">
-        <a href="{{url_for('addStudent')}}" class=btn btn-default ">Add Student</a>
-        <a href="{{url_for('addProfessor')}}" class=btn btn-info">Add Professor</a>
-        <a href="{{url_for('deleteEntry')}}" class=btn btn-info">Delete Entry</a>
-        <a href="{{url_for('viewStudent')}}" class=btn btn-info">View Student</a>
-        
-        <a href="{{url_for('addCourse')}}" class=btn btn-info">Add Course</a>
-        <a href="{{url_for('editCourse')}}" class=btn btn-info">Edit Course</a>
-        <a href="{{url_for('viewCourses')}}" class=btn btn-info">View Courses</a>
-                                                                
-        <a href="{{url_for('viewStudentSchedule')}}" class=btn btn-info">View Student Schedule</a>
-		<a href="{{url_for('editStudentSchedule')}}" class=btn btn-info">Edit Student Schedule</a>
-		<a href="{{url_for('viewCourseReviews')}}" class=btn btn-info">View Course Reviews</a>
+        <a href="{{url_for('addStudent')}}" class=btn btn-default">Add Student</a><br />
+        <a href="{{url_for('viewStudent')}}" class=btn btn-info">View Student</a><br />
+        <br /><br />
+        <a href="{{url_for('addProfessor')}}" class=btn btn-info">Add Professor</a><br />
+        <a href="{{url_for('editProfessor')}}" class=btn btn-info">Edit Professor</a><br />
+        <a href="{{url_for('viewProfessor')}}" class=btn btn-info">View Professor</a><br />
+        <br /><br />
+        <a href="{{url_for('addCourse')}}" class=btn btn-info">Add Course</a><br />
+        <a href="{{url_for('editCourse')}}" class=btn btn-info">Edit Course</a><br />
+        <a href="{{url_for('viewCourses')}}" class=btn btn-info">View Courses</a><br />
+        <br /><br />
+        <a href="{{url_for('editStudentSchedule')}}" class=btn btn-info">Edit Student Schedule</a><br />
+        <a href="{{url_for('viewStudentSchedule')}}" class=btn btn-info">View Student Schedule</a><br />
+        <br /><br />
+		<a href="{{url_for('viewCourseReviews')}}" class=btn btn-info">View Course Reviews</a><br />
     </form>
 {% endblock %}

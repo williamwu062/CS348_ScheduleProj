@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Professor Page{% endblock %}
+{% block content %}
+  <h1>Professor</h1>
+  <ul>
+    <li>Name : {{ professor.name }}</li>
+    <li>Department : {{ professor.department }}</li>
+    <li>Join Date : {{ professor.join_date }}</li>
+  </ul>
+{% endblock %}

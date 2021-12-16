@@ -1,0 +1,25 @@
+<!-- TODO ANGGA -->
+{% extends "base.html" %}
+{% block title %}Add Course{% endblock %}
+{% block content %}
+  <h1>Add Course</h1>
+  <form method="POST" action="">
+    <label for="InputID">Course ID</label>
+    <input type="number" name="id" ><br />
+    <label for="InputName">Department</label>
+    <input type="text" name="department"><br />
+    <label for="InputDOB">Course Name</label>
+    <input type="text" name="coursename"><br />
+    <!-- <div class="form-group">
+      <label for="InputEmail1">Email address</label>
+      <input type="email" class="form-control" id="InputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+      <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+    </div>
+    <div class="form-group">
+      <label for="InputPassword1">Password</label>
+      <input type="password" class="form-control" id="InputPassword1" placeholder="Password">
+    </div> -->
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+{% endblock %}
