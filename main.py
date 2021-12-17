@@ -3,7 +3,7 @@ from flask import Flask, redirect, url_for, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 import configparser
 from datetime import datetime
-from Tables import Courses, Students, Reviews, StudentSchedule, Professors, CourseTimeSlots, app, db
+from Tables import Courses, Students, Reviews, StudentSchedule, CourseTimeSlots, Professors, app, db
 
 @app.route("/", methods=["POST", "GET"])
 def home():
@@ -14,6 +14,8 @@ def home():
     return url_for("addProfessor")
   if request.form.get("addCourse"):
     return url_for("addCourse")
+  if request.form.get("addCourseReview"):
+    return url_for("addCourseReview")    
   if request.form.get("editProfessor"):
     return url_for("editProfessor")
   if request.form.get("editCourse"):
@@ -77,7 +79,7 @@ def editProfessor():
   if request.method == "POST":
       data = request.form
       if data['id'] is not None and data['id'] != '':
-          professor = Professors.query.filter_by(professor_id = data['id']).first()
+          professor = Professors.query.filter_by(prof_id = data['id']).first()
           if professor is not None:
             if data['dept'] is not None and len(data['dept']) > 0:
               professor.department = data['dept']
@@ -100,7 +102,7 @@ def viewProfessor():
 
 @app.route("/view_professor/<id>")
 def viewProfessorTable(id):
-  return render_template("viewProfessorTable.html", professor=Professors.query.filter_by(professor_id=id).first())
+  return render_template("viewProfessorTable.html", professor=Professors.query.filter_by(prof_id=id).first())
 
 @app.route("/delete_entry")
 def deleteEntry():
@@ -121,7 +123,6 @@ def editCourse():
                 if data['coursename'] is not None and len(data['coursename']) > 0:
                     course.courseName = data['coursename']
                 db.session.commit()
-
         return redirect(url_for('home'))
     else:
         print('yo')
@@ -197,6 +198,20 @@ def viewCourses():
     else:
         return render_template("viewCourses.html")
 
+@app.route("/add_course_review", methods=["POST", "GET"])
+def addCourseReview():
+    if request.method == "POST":
+        data = request.form
+        if data['course_id'] is not None and data['review_id'] is not None:
+            now = datetime.now()
+            date_time = now.strftime("%m/%d/%Y")
+            review = Reviews(review_id = data['review_id'], course_id = data['course_id'], semester = data['semester'], review = data['review'], review_date = date_time)
+            db.session.add(review)
+            db.session.commit()
+            return redirect(url_for('home'))
+    else:
+        return render_template("addCourseReview.html")
+        
 
 @app.route("/view_course_reviews", methods=["POST", "GET"])
 def viewCourseReviews():
