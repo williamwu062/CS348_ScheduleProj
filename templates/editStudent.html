@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Edit Student{% endblock %}
+{% block content %}
+  <h1>Edit Student</h1>
+  <form method="POST" action="">
+    <label for="InputID">Student ID</label>
+    <input type="number" name="id" ><br />
+    <label for="InputName">Name</label>
+    <input type="text" name="name"><br />
+    <label for="InputDept">Major</label>
+    <input type="text" name="major"><br />
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+{% endblock %}

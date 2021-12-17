@@ -1,11 +1,24 @@
 {% extends "base.html" %}
-{% block title %}Add Student{% endblock %}
+
 {% block content %}
-  <h1>Student</h1>
-  <ul>
-    <li>Name : {{ student.name }}</li>
-    <li>Birthday : {{ student.birthdate }}</li>
-    <li>Major : {{ student.major }}</li>
-    <li>Enrollment Date : {{ student.enrollment_date }}</li>
-  </ul>
+  <table id="major_data" class="table table-striped">
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Student Name</th>
+        <th>Birthday</th>
+        <th>Major</th>
+        <th>Enrollment Date</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>{{ student.student_id }}</td>
+          <td>{{ student.name }}</td>
+          <td>{{ student.birthdate }}</td>
+          <td>{{ student.major }}</td>
+          <td>{{ student.enrollment_date }}</td>
+        </tr>
+    </tbody>
+  </table>
 {% endblock %}
