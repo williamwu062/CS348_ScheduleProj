@@ -92,7 +92,6 @@ def viewStudent():
 def viewStudentTable(id):
   db.session.connection(execution_options={'isolation_level': 'SERIALIZABLE'})
   if Students.query.filter_by(student_id=id).first() is not None:
-    query = text("select * from Students where student_id = :sid")
     query_res = db.session.execute("select * from Students where student_id=:temp_id", {'temp_id':id}).fetchall()
     print(query_res[0][0])
     print(query_res[0][1])
