@@ -60,17 +60,17 @@ class Reviews(db.Model):
 	review_id = db.Column(db.Integer, primary_key=True)
 	semester = db.Column(db.String(250))
 	course_id = db.Column(db.Integer, db.ForeignKey(Courses.course_id), nullable=False)
-	review = db.Column(db.String(250))
-	review_date = db.Column(db.DateTime, onupdate=datetime.now())
-	student_id = db.Column(db.Integer, db.ForeignKey(Students.student_id), nullable=False)
+	review = db.Column(db.String(500))
+	review_date = db.Column(db.String(250))
+	# student_id = db.Column(db.Integer, db.ForeignKey(Students.student_id), nullable=False)
 	
-	def __init__(self, review_id, semester, course_id, review, review_date, student_id):
+	def __init__(self, review_id, semester, course_id, review, review_date):
 		self.review_id = review_id
 		self.semester = semester
 		self.course_id = course_id
 		self.review = review
 		self.review_date = review_date
-		self.student_id = student_id
+		# self.student_id = student_id
 		
 class StudentSchedule(db.Model):
 	student_id = db.Column(db.Integer, db.ForeignKey(Students.student_id), nullable=False, primary_key=True)
