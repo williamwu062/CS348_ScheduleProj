@@ -43,7 +43,7 @@ class CourseTimeSlots(db.Model):
 
 
 class Students(db.Model):
-    student_id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, primary_key=True, index=True)
     name = db.Column(db.String(250))
     birthdate = db.Column(db.String(250))
     major = db.Column(db.String(250))

@@ -251,7 +251,6 @@ def addCourseReview():
             return redirect(url_for('home'))
     else:
         return render_template("addCourseReview.html")
-        
 
 @app.route("/view_course_reviews", methods=["POST", "GET"])
 def viewCourseReviews():
