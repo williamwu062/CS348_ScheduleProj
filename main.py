@@ -31,64 +31,67 @@ def home():
 @app.route("/add_student", methods=["POST", "GET"])
 def addStudent():
     if request.method == "POST":
-        data = request.form
-        for name in data.keys():
-            print(name)
-        print(data['enrolldate'])
-        student = Students(int(data['id']), data['name'],
-                           data['birthdate'], data['major'], data['enrolldate'])
-        db.session.add(student)
-        db.session.commit()
-        return redirect(url_for('home'))
+      data = request.form
+      for name in data.keys():
+          print(name)
+      print(data['enrolldate'])
+      student = Students(int(data['id']), data['name'],
+                          data['birthdate'], data['major'], data['enrolldate'])
+      db.session.add(student)
+      db.session.commit()
+      return redirect(url_for('home'))
     else:
-        print('yo')
-        return render_template("addStudent.html")
+      print('yo')
+      return render_template("addStudent.html")
 
 
 @app.route("/view_student", methods=["POST", "GET"])
 def viewStudent():
     if request.method == "POST":
+      if request.form.get('student_check'):
         id = int(request.form['id'])
         return redirect(url_for('viewStudentTable', id=id))
+      elif request.form.get('major_check'):
+        query = """"select major, count(*) as 'number of students' from Students group by major;"""
     else:
-        return render_template("viewStudent.html")
+      return render_template("viewStudent.html")
 
 
 @app.route("/<id>")
 def viewStudentTable(id):
-    return render_template("viewStudentTable.html", student=Students.query.filter_by(student_id=id).first())
+  return render_template("viewStudentTable.html", student=Students.query.filter_by(student_id=id).first())
 
 
 @app.route("/add_professor")
 def addProfessor():
-    return render_template("addProfessor.html")
+  return render_template("addProfessor.html")
 
 
 @app.route("/delete_entry")
 def deleteEntry():
-    return render_template("deleteEntry.html")
+  return render_template("deleteEntry.html")
 
 
 @app.route("/edit_course", methods=["POST", "GET"])
 def editCourse():
-    if request.method == "POST":
-        data = request.form
-        for name in data.keys():
-            print(name)
+  if request.method == "POST":
+    data = request.form
+    for name in data.keys():
+      print(name)
 
-        if data['id'] is not None and data['id'] != '':
-            course = Courses.query.filter_by(course_id=data['id']).first()
-            if course is not None:
-              if data['department'] is not None and len(data['department']) > 0:
-                course.department = data['department']
-              if data['coursename'] is not None and len(data['coursename']) > 0:
-                course.courseName = data['coursename']
-              db.session.commit()
+    if data['id'] is not None and data['id'] != '':
+      course = Courses.query.filter_by(course_id=data['id']).first()
+      if course is not None:
+        if data['department'] is not None and len(data['department']) > 0:
+          course.department = data['department']
+        if data['coursename'] is not None and len(data['coursename']) > 0:
+          course.courseName = data['coursename']
+        db.session.commit()
 
-        return redirect(url_for('home'))
-    else:
-        print('yo')
-        return render_template("editCourse.html")
+    return redirect(url_for('home'))
+  else:
+    print('yo')
+    return render_template("editCourse.html")
 
 
 @app.route("/add_course", methods=["POST", "GET"])
