@@ -285,6 +285,8 @@ def viewCourseReviews():
         courseName = data['coursename']
 
         # Get the course_id associated with that courseName
+        db.session.connection(execution_options={'isolation_level': 'READ UNCOMMITTED'})
+        #result = db.session.execute("SELECT * from Courses where courseName=:temp_name", {'temp_name':courseName}).fetchall()
         result = Courses.query.filter_by(courseName=courseName).first()
         courseID = 0
         try:
@@ -320,6 +322,7 @@ def viewStudentSchedule():
         studentID = data['id']
 
         # Get course_ids associated with the schedule of the student with that student_id
+        db.session.connection(execution_options={'isolation_level': 'READ UNCOMMITTED'})
         result = StudentSchedule.query.filter_by(student_id=studentID)
         num_results = len(result.all())
         print("num_results =", num_results)
@@ -332,6 +335,7 @@ def viewStudentSchedule():
         # Get courses associated with each course_id, collate into a string
         studentSchedule = ""
         for row in result:
+            #result2 = db.session.execute("SELECT * from Courses where course_id=:temp_id", {'temp_id':row.course_id}).fetchall()
             result2 = Courses.query.filter_by(course_id=row.course_id).first()
             try:
                 studentSchedule += "Course ID: " + str(result2.course_id) + ", Department: " + str(
@@ -393,6 +397,7 @@ def editStudentSchedule():
                     return render_template("editStudentScheduleLanding.html", studentScheduleLanding=result)
                 studentCourse = StudentSchedule(
                     student_id=int(studentID), course_id=int(courseID))
+                db.session.connection(execution_options={'isolation_level': 'SERIALIZABLE'})
                 db.session.add(studentCourse)
                 db.session.commit()
                 result = "Successfully added course with id " + \
@@ -411,6 +416,7 @@ def editStudentSchedule():
                 if checkStudentCourse is not None:
                     StudentSchedule.query.filter_by(
                         student_id=studentID, course_id=courseID).delete()
+                    db.session.connection(execution_options={'isolation_level': 'SERIALIZABLE'})
                     db.session.commit()
                     result = "Successfully deleted course with id " + \
                         str(courseID) + " from student's schedule"
