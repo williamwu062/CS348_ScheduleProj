@@ -160,6 +160,7 @@ def editCourse():
           course.department = data['department']
         if data['coursename'] is not None and len(data['coursename']) > 0:
           course.courseName = data['coursename']
+        db.session.connection(execution_options={'isolation_level': 'READ UNCOMMITTED'})
         db.session.commit()
 
     return redirect(url_for('home'))
@@ -184,6 +185,8 @@ def addCourse():
                             int(data['id']), data['department'], data['coursename'])
                         courseTimeSlot = CourseTimeSlots(
                             int(data['id']), data['dayOfWeek'], int(data['profID']))
+
+                        db.session.connection(execution_options={'isolation_level': 'READ UNCOMMITTED'})
                         db.session.add(courseTimeSlot)
                         db.session.add(course)
                         db.session.commit()
@@ -220,6 +223,7 @@ def viewCourses():
             if data.get('alphabet'):
                 rawQuery = rawQuery + """ ORDER BY courseName"""
 
+        db.session.connection(execution_options={'isolation_level': 'SERIALIZABLE'})
         queryResult = db.session.execute(rawQuery)
 
         courses = ""
@@ -335,6 +339,7 @@ def createStudentSchedule():
             if Courses.query.filter_by(course_id=int(id)).first() is not None:
                 scheduleClass = StudentSchedule(int(studentID), int(id))
 
+                db.session.connection(execution_options={'isolation_level': 'READ UNCOMMITTED'})
                 db.session.add(scheduleClass)
                 db.session.commit()
         return redirect(url_for('home'))

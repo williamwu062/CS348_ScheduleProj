@@ -11,8 +11,8 @@ db = SQLAlchemy(app)
 
 class Courses(db.Model):
     course_id = db.Column(db.Integer, primary_key=True)
-    department = db.Column(db.String(250))
-    courseName = db.Column(db.String(250))
+    department = db.Column(db.String(250), index=True)
+    courseName = db.Column(db.String(250), index=True)
 
     def __init__(self, course_id, department, courseName):
         self.course_id = course_id
