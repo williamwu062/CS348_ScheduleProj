@@ -165,13 +165,15 @@ def editCourse():
       print(name)
 
     if data['id'] is not None and data['id'] != '':
+        
       course = Courses.query.filter_by(course_id=data['id']).first()
       if course is not None:
+        db.session.connection(execution_options={'isolation_level': 'READ UNCOMMITTED'})
         if data['department'] is not None and len(data['department']) > 0:
           course.department = data['department']
         if data['coursename'] is not None and len(data['coursename']) > 0:
           course.courseName = data['coursename']
-        db.session.connection(execution_options={'isolation_level': 'READ UNCOMMITTED'})
+        
         db.session.commit()
 
     return redirect(url_for('home'))
@@ -215,6 +217,7 @@ def viewCourses():
         department = data['department']
         courseName = data['coursename']
 
+        db.session.connection(execution_options={'isolation_level': 'SERIALIZABLE'})
         groupBy = False
         if data.get('groupdept'):
             groupBy = True
