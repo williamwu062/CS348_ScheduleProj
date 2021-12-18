@@ -108,6 +108,7 @@ def addProfessor():
     if request.method == "POST":
         data = request.form
         professor = Professors(int(data['id']), data['name'], data['dept'], data['joined'])
+        db.session.connection(execution_options={'isolation_level': 'READ UNCOMMITTED'})
         db.session.add(professor)
         db.session.commit()
         return redirect(url_for('home'))
@@ -117,6 +118,7 @@ def addProfessor():
 @app.route("/edit_professor", methods=["POST", "GET"])
 def editProfessor():
   if request.method == "POST":
+      db.session.connection(execution_options={'isolation_level': 'SERIALIZABLE'})
       data = request.form
       if data['id'] is not None and data['id'] != '':
           professor = Professors.query.filter_by(prof_id = data['id']).first()
@@ -135,6 +137,7 @@ def editProfessor():
 @app.route("/view_professor", methods=["POST", "GET"])
 def viewProfessor():
     if request.method == "POST":
+        db.session.connection(execution_options={'isolation_level': 'READ UNCOMMITTED'})
         data = request.form
         date = data['date']
         date2 = data['date2']
@@ -440,6 +443,7 @@ def deleteEntry():
     if request.method == "POST":
         data = request.form
         id = data['id']
+        db.session.connection(execution_options={'isolation_level': 'SERIALIZABLE'})
         if(data['deleteOption'] == "student"):
             record = Students.query.filter_by(student_id = id).first()
             db.session.delete(record)
