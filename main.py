@@ -210,21 +210,29 @@ def viewCourses():
             rawQuery = """SELECT department, sum(course_id) AS sumIDs FROM Courses GROUP BY department"""
             if data.get('alphabet'):
                 rawQuery = rawQuery + """ ORDER BY department"""
-
+            queryResult = db.session.execute(rawQuery)
+ 
         else:
             rawQuery = """SELECT * FROM Courses"""
             if courseName is not None and len(courseName) > 0:
-                rawQuery = """SELECT * FROM Courses WHERE courseName=\"""" + courseName + """\""""
+                rawQuery = """SELECT * FROM Courses WHERE courseName=:courseName"""
             if department is not None and len(department) > 0:
-                rawQuery = """SELECT * FROM Courses WHERE department=\"""" + department + """\""""
+                rawQuery = """SELECT * FROM Courses WHERE department=:department"""
                 if courseName is not None and len(courseName) > 0:
-                    rawQuery = """SELECT * FROM Courses WHERE department=\"""" + \
-                        department + """\" AND courseName=\"""" + courseName + """\""""
+                    rawQuery = """SELECT * FROM Courses WHERE department=:department AND courseName=:courseName"""
             if data.get('alphabet'):
                 rawQuery = rawQuery + """ ORDER BY courseName"""
 
-        db.session.connection(execution_options={'isolation_level': 'SERIALIZABLE'})
-        queryResult = db.session.execute(rawQuery)
+            if courseName is not None and department is not None and len(courseName) > 0 and len(department) > 0:
+                queryResult = db.session.execute(rawQuery, {'department':department, 'courseName':courseName}).fetchall()
+                
+            else:
+                if courseName is not None and len(courseName) > 0:
+                    queryResult = db.session.execute(rawQuery, {'courseName':courseName}).fetchall()
+                elif department is not None and len(department) > 0:
+                    queryResult = db.session.execute(rawQuery, {'department':department}).fetchall()
+                else:
+                    queryResult = db.session.execute(rawQuery)
 
         courses = ""
         for row in queryResult:
