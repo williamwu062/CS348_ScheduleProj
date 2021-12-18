@@ -59,7 +59,7 @@ class Students(db.Model):
 class Reviews(db.Model):
 	review_id = db.Column(db.Integer, primary_key=True)
 	semester = db.Column(db.String(250))
-	course_id = db.Column(db.Integer, db.ForeignKey(Courses.course_id), nullable=False)
+	course_id = db.Column(db.Integer, db.ForeignKey(Courses.course_id), nullable=False, index=True)
 	review = db.Column(db.String(500))
 	review_date = db.Column(db.String(250))
 	# student_id = db.Column(db.Integer, db.ForeignKey(Students.student_id), nullable=False)
@@ -73,7 +73,7 @@ class Reviews(db.Model):
 		# self.student_id = student_id
 		
 class StudentSchedule(db.Model):
-	student_id = db.Column(db.Integer, db.ForeignKey(Students.student_id), nullable=False, primary_key=True)
+	student_id = db.Column(db.Integer, db.ForeignKey(Students.student_id), nullable=False, primary_key=True, index=True)
 	course_id = db.Column(db.Integer, db.ForeignKey(Courses.course_id), nullable=False, primary_key=True)
 	
 	def __init__(self, student_id, course_id):
