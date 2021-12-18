@@ -8,7 +8,6 @@ from sqlalchemy.sql import text
 
 @app.route("/", methods=["POST", "GET"])
 def home():
-  print('hello')
   if request.form.get("addStudent"):
     return url_for("addStudent")
   if request.form.get("addProfessor"):
@@ -274,6 +273,7 @@ def addCourseReview():
             now = datetime.now()
             date_time = now.strftime("%m/%d/%Y")
             review = Reviews(review_id = data['review_id'], course_id = data['course_id'], semester = data['semester'], review = data['review'], review_date = date_time)
+            db.session.connection(execution_options={'isolation_level': 'READ UNCOMMITTED'})
             db.session.add(review)
             db.session.commit()
             return redirect(url_for('home'))
