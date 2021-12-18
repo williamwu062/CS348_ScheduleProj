@@ -23,7 +23,7 @@ class Professors(db.Model):
     prof_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250))
     department = db.Column(db.String(250))
-    join_date = db.Column(db.String(250))
+    join_date = db.Column(db.String(250), index=True)
 
     def __init__(self, prof_id, name, department, join_date):
         self.prof_id = prof_id
