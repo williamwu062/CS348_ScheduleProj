@@ -1,10 +1,29 @@
 {% extends "base.html" %}
 {% block title %}View Professors{% endblock %}
 {% block content %}
+  <script type="text/javascript">
+
+    function betweenCheck() {
+      if (document.getElementById('between').checked) {
+          document.getElementById('date2').style.display = 'block';
+      } else {
+          document.getElementById('date2').style.display = 'none';
+      }
+    }
+
+  </script>
   <h1>View Professor</h1>
   <form method="post" action="">
-    <label for="InputID">Professor ID</label>
-    <input type="text" name="id" ><br />
+    <label for="date">By Join Date</label><br />
+    <input type="radio" value="before" id="before" name="dateOption" onclick="javascript:betweenCheck()">
+    <label for="date">Before</label><br />
+    <input type="radio" value="after" id="after" name="dateOption" onclick="javascript:betweenCheck()">
+    <label for="date">After</label><br />
+    <input type="radio" value="between" id="between" name="dateOption" onclick="javascript:betweenCheck()">
+    <label for="date">Between</label><br />
+    <input type="date" id="date" name="date"><br />
+    <input type="date" id="date2" name="date2" style="display:none"><br />
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
+  
 {% endblock %}

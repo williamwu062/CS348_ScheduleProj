@@ -1,10 +1,19 @@
 {% extends "base.html" %}
 {% block title %}Professor Page{% endblock %}
 {% block content %}
-  <h1>Professor</h1>
-  <ul>
-    <li>Name : {{ professor.name }}</li>
-    <li>Department : {{ professor.department }}</li>
-    <li>Join Date : {{ professor.join_date }}</li>
-  </ul>
+  <div id="professorList"></div>
+  <script>
+    var profString = "{{professors}}"
+    var prof = profString.split('\t')
+
+    var str = '<h1>List of Professors</h1><ul>'
+    prof.forEach(function(prof) {
+      if(prof !== ''){
+        str += '<li>'+ prof + '</li>';
+      }
+    }); 
+    str += '</ul>';
+
+    document.getElementById("professorList").innerHTML = str;
+  </script>
 {% endblock %}
