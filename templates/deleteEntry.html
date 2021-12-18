@@ -4,12 +4,16 @@
 {% block content %}
   <h1>Delete Entry</h1>
   <form method="post" action="">
-    <input type="radio" id="student" name="deleteStudent" value="Student">
-    <label for="student">Student</label>
-    <input type="radio" id="professor" name="deleteStudent" value="professor">
+    <input type="radio" value="student" id="student" name="deleteOption">
+    <label for="student">Student</label><br />
+    <input type="radio" value="professor" id="professor" name="deleteOption">
     <label for="professor">Professor</label><br />
+    <input type="radio" value="course" id="course" name="deleteOption">
+    <label for="course">Course</label><br />
+    <input type="radio" value="review" id = "review" name="deleteOption">
+    <label for="review">Course Review</label><br />
     <label for="InputID">ID to be Deleted</label>
-    <input type="number" id="InputID"><br />
+    <input type="number" name="id"><br />
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 {% endblock %}

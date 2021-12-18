@@ -35,6 +35,8 @@ def home():
     return url_for("viewProfessorTable")
   if request.form.get("editStudentSchedule"):
     return url_for("editStudentSchedule")
+  if request.form.get("deleteEntry"):
+    return url_for("deleteEntry")
   return render_template("index.html")
 
 @app.route('/edit_student', methods=["GET", "POST"])
@@ -133,18 +135,27 @@ def editProfessor():
 @app.route("/view_professor", methods=["POST", "GET"])
 def viewProfessor():
     if request.method == "POST":
-        id = int(request.form['id'])
-        return redirect(url_for('viewProfessorTable', id=id))
+        data = request.form
+        date = data['date']
+        date2 = data['date2']
+        if(date is not None):
+            if (data['dateOption'] == "before"):
+                queryResult = Professors.query.filter(Professors.join_date < date).all()
+            elif (data['dateOption'] == "after"):
+                queryResult = Professors.query.filter(Professors.join_date > date).all()
+            elif (data['dateOption'] == "between"):
+                if(date2 is not None):
+                    queryResult = Professors.query.filter(Professors.join_date > date).filter(Professors.join_date < date2).all()
+
+        professors = ""
+        for row in queryResult:
+            professors += "Professor ID: " + \
+                str(row.prof_id) + ", Name: " + \
+                row.name + ", Department: " + row.department + ", Join Date: " + row.join_date + "\t"
+        return render_template("viewProfessorTable.html", professors = professors)
     else:
         return render_template("viewProfessor.html")
 
-@app.route("/view_professor/<id>")
-def viewProfessorTable(id):
-  return render_template("viewProfessorTable.html", professor=Professors.query.filter_by(prof_id=id).first())
-
-@app.route("/delete_entry")
-def deleteEntry():
-  return render_template("deleteEntry.html")
 
 @app.route("/edit_course", methods=["POST", "GET"])
 def editCourse():
@@ -414,6 +425,31 @@ def editStudentSchedule():
 
     if request.method == "GET":
         return render_template("editStudentSchedule.html")
+
+@app.route("/delete_entry", methods=["POST", "GET"])
+def deleteEntry():
+    if request.method == "POST":
+        data = request.form
+        id = data['id']
+        if(data['deleteOption'] == "student"):
+            record = Students.query.filter_by(student_id = id).first()
+            db.session.delete(record)
+            db.session.commit()
+        elif(data['deleteOption'] == "professor"):
+            record = Professors.query.filter_by(prof_id = id).first()
+            db.session.delete(record)
+            db.session.commit()
+        elif(data['deleteOption'] == "course"):
+            record = Courses.query.filter_by(course_id = id).first()
+            db.session.delete(record)
+            db.session.commit()
+        elif(data['deleteOption'] == "review"):
+            record = Reviews.query.filter_by(review_id = id).first()
+            db.session.delete(record)
+            db.session.commit()
+        return redirect(url_for('home'))
+    else:
+        return render_template("deleteEntry.html")
 
 
 if __name__ == "__main__":
